@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+
+  apache:
+    container_name: sgds_apache
+    build: ./docker/build/apache/
+    networks:
+      - mynet
+    depends_on:
+      - mariadb
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/etc/apache/project.conf:/etc/apache2/sites-enabled/000-default.conf:ro
+      - ./docker/etc/php/php.ini:/etc/php.ini:ro
+      - ./docker/etc/php/php-cli.ini:/etc/php-cli.ini:ro
+      - ./app/wordpress:/var/web/app/:cached
+      - type: bind
+        source: ./app/wordpress/wp-content
+        target: /app/wp-content
+        consistency: cached
+
+
+  mariadb:
+    container_name: sgds_mariadb
+    image: mariadb:10.4
+    ports:
+      - "3306"
+    volumes:
+      - ./docker/etc/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
+      - mariadb-data:/var/lib/mysql/:delegated
+    environment:
+      MYSQL_ROOT_PASSWORD: qwerty
+      MYSQL_DATABASE: sgds_dev
+    networks:
+      - mynet
+
+
+  phpmyadmin:
+    container_name: sgds_phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mariadb
+    ports:
+      - "8001:80"
+    networks:
+      - mynet
+    depends_on:
+      - mariadb
+
+      
+volumes:
+  mariadb-data:
+
+ 
+networks:
+  mynet:
