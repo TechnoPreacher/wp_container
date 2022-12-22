@@ -33,6 +33,10 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install mysqli pdo gd mbstring bcmath zip opcache
 
+    
+RUN pecl install xdebug-3.1.6\
+&& docker-php-ext-enable xdebug
+
 
 RUN sed -e 's%www-data:x:33%www-data:x:1000%g' /etc/passwd -i
 

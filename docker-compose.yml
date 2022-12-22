@@ -1,20 +1,30 @@
 version: '3.9'
 
+#common declarations
+networks:
+  mynet:
+
+volumes:
+  mariadb-data:
+
+ 
+
 services:
 
   apache:
-    container_name: sgds_apache
+    container_name: ${PROJECT_NAME}_apache
     build: ./docker/build/apache/
     networks:
       - mynet
-    depends_on:
-      - mariadb
+   # depends_on:
+   #   - mariadb
     ports:
       - "80:80"
     volumes:
       - ./docker/etc/apache/project.conf:/etc/apache2/sites-enabled/000-default.conf:ro
-      - ./docker/etc/php/php.ini:/etc/php.ini:ro
-      - ./docker/etc/php/php-cli.ini:/etc/php-cli.ini:ro
+      - ./docker/etc/php/php.ini:/usr/local/etc/php/php.ini:ro
+      #- ./docker/etc/php/php-cli.ini:/usr/local/etc/php/php-cli.ini:ro
+      - ./docker/etc/php/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini:ro
       - ./app/wordpress:/var/web/app/:cached
       - type: bind
         source: ./app/wordpress/wp-content
@@ -23,22 +33,25 @@ services:
 
 
   mariadb:
-    container_name: sgds_mariadb
-    image: mariadb:10.4
+    container_name: ${PROJECT_NAME}_mariadb
+    image: mariadb #:10.4
+    restart: always
     ports:
       - "3306"
     volumes:
       - ./docker/etc/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
       - mariadb-data:/var/lib/mysql/:delegated
     environment:
-      MYSQL_ROOT_PASSWORD: qwerty
-      MYSQL_DATABASE: sgds_dev
+      MARIADB_ROOT_PASSWORD: ${ROOT_PASSWORD}
+      MYSQL_USER: ${REG_USER}
+      MYSQL_PASSWORD: ${REG_PASSWORD}
+      MYSQL_DATABASE: ${PROJECT_NAME}_db
     networks:
       - mynet
 
 
   phpmyadmin:
-    container_name: sgds_phpmyadmin
+    container_name: ${PROJECT_NAME}_phpmyadmin
     image: phpmyadmin/phpmyadmin
     environment:
       PMA_HOST: mariadb
@@ -46,13 +59,5 @@ services:
       - "8001:80"
     networks:
       - mynet
-    depends_on:
-      - mariadb
-
-      
-volumes:
-  mariadb-data:
-
- 
-networks:
-  mynet:
+   # depends_on:
+    #  - mariadb
