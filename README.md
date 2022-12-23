@@ -38,7 +38,7 @@ WP_HOME=http://...
 WP_SITEURL=${WP_HOME}/wp
 ```
 
-Containers bring to life
+Containers bring to life and to die
 -
 
 * run docker-compose from cmd in storage folder
