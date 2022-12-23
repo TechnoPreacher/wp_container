@@ -1,4 +1,0 @@
-
-
-WORKDIR /var/web/app
-

@@ -1,4 +1,7 @@
-FROM php:7.4-apache
+## may be overwritten in .env with PHP_VERSION variable
+ARG  PHP_VERSION
+
+FROM php:${PHP_VERSION}
 
 RUN a2enmod ssl rewrite
 
@@ -33,20 +36,13 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install mysqli pdo gd mbstring bcmath zip opcache
 
-    
+## XDEBUG    
 RUN pecl install xdebug-3.1.6\
 && docker-php-ext-enable xdebug
-
 
 RUN sed -e 's%www-data:x:33%www-data:x:1000%g' /etc/passwd -i
 
 RUN chown -R www-data: .
-
-RUN curl -fsSLO https://get.docker.com/builds/Linux/x86_64/docker-17.04.0-ce.tgz \
-  && tar xzvf docker-17.04.0-ce.tgz \
-  && mv docker/docker /usr/local/bin \
-  && rm -r docker docker-17.04.0-ce.tgz
-
 
 WORKDIR /var/web/app
 
