@@ -1,6 +1,9 @@
 ## may be overwritten in .env with PHP_VERSION variable
 ARG  PHP_VERSION
 
+
+
+
 FROM php:${PHP_VERSION}
 
 RUN a2enmod ssl rewrite
@@ -13,13 +16,21 @@ RUN apt-get update -y &&\
             wget \
             ca-certificates \
             vim \
+            msmtp\                          #for mstmp install (look at https://gist.github.com/michaelbragg/13cde0a3b6ae4770bbd578a8db2b7918#file-msmtprc)
             nano \
             git \
-            default-mysql-client
+            default-mysql-client\
+            && rm -rf /var/lib/apt/lists/*  #for mstmp install
+
+COPY msmtprc /etc/msmtprc                   #for mstmp install
+RUN chown :msmtp /etc/msmtprc && \          #for mstmp install
+    chmod 640 /etc/msmtprc                  #for mstmp install
 
 RUN echo "GREEN='\[\e[1;32m\]'" >> /root/.bashrc &&\
     echo "reset='\[\e[0m\]'" >> /root/.bashrc &&\
     echo 'PS1="${GREEN}(docker)${reset} [\u@\h \W]\\$ "' >> /root/.bashrc
+
+
 
 ## PHP
 RUN apt-get update && apt-get install -y \
