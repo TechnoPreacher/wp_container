@@ -8,6 +8,8 @@ FROM php:${PHP_VERSION}
 
 RUN a2enmod ssl rewrite
 
+##for mstmp install (look at https://gist.github.com/michaelbragg/13cde0a3b6ae4770bbd578a8db2b7918#file-msmtprc)
+
 ## Basic tools and ssh2
 RUN apt-get update -y &&\
     apt-get upgrade -y &&\
@@ -16,15 +18,15 @@ RUN apt-get update -y &&\
             wget \
             ca-certificates \
             vim \
-            msmtp\                          #for mstmp install (look at https://gist.github.com/michaelbragg/13cde0a3b6ae4770bbd578a8db2b7918#file-msmtprc)
+            msmtp\ 
             nano \
             git \
-            default-mysql-client\
-            && rm -rf /var/lib/apt/lists/*  #for mstmp install
+            default-mysql-client \
+            && rm -rf /var/lib/apt/lists/*  
 
-COPY msmtprc /etc/msmtprc                   #for mstmp install
-RUN chown :msmtp /etc/msmtprc && \          #for mstmp install
-    chmod 640 /etc/msmtprc                  #for mstmp install
+COPY msmtprc /etc/msmtprc                   
+RUN chown :msmtp /etc/msmtprc && \          
+    chmod 640 /etc/msmtprc                  
 
 RUN echo "GREEN='\[\e[1;32m\]'" >> /root/.bashrc &&\
     echo "reset='\[\e[0m\]'" >> /root/.bashrc &&\
@@ -56,4 +58,3 @@ RUN sed -e 's%www-data:x:33%www-data:x:1000%g' /etc/passwd -i
 RUN chown -R www-data: .
 
 WORKDIR /var/web/app
-
